@@ -12,25 +12,25 @@
 
 /* ── TOKENS ── */
 :root {
-  --bg:           #0c0e12;
-  --surface:      #12151b;
-  --surface2:     #181c24;
-  --surface3:     #1f242e;
-  --border:       #252b35;
-  --border2:      #2d3444;
-  --text:         #e2e8f0;
-  --text2:        #8b9bb0;
-  --muted:        #46526a;
-  --accent:       #ff5c35;
-  --accent-dim:   rgba(255,92,53,0.14);
-  --green:        #22c55e;
-  --green-dim:    rgba(34,197,94,0.12);
-  --yellow:       #f59e0b;
-  --red:          #ef4444;
-  --blue:         #60a5fa;
-  --radius:       12px;
-  --sidebar-w:    258px;
-  --panel-w:      390px;
+  --bg:          #0c0e12;
+  --surface:     #12151b;
+  --surface2:    #181c24;
+  --surface3:    #1f242e;
+  --border:      #252b35;
+  --border2:     #2d3444;
+  --text:        #e2e8f0;
+  --text2:       #8b9bb0;
+  --muted:       #46526a;
+  --accent:      #ff5c35;
+  --accent-dim:  rgba(255,92,53,0.14);
+  --green:       #22c55e;
+  --green-dim:   rgba(34,197,94,0.12);
+  --yellow:      #f59e0b;
+  --red:         #ef4444;
+  --blue:        #60a5fa;
+  --radius:      12px;
+  --sidebar-w:   260px;
+  --panel-w:     390px;
 }
 
 body {
@@ -144,13 +144,9 @@ body {
   width: 100%;
   margin-bottom: 2px;
 }
-.filter-btn:hover { background: var(--surface2); color: var(--text); }
+.filter-btn:hover  { background: var(--surface2); color: var(--text); }
 .filter-btn.active { background: var(--surface3); color: var(--text); }
-.filter-btn .fdot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+.filter-btn .fdot  { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .filter-btn .fcount {
   margin-left: auto;
   font-family: 'Space Mono', monospace;
@@ -186,7 +182,7 @@ body {
   justify-content: center;
   gap: 6px;
 }
-.btn-sync:hover { border-color: var(--accent); color: var(--accent); }
+.btn-sync:hover    { border-color: var(--accent); color: var(--accent); }
 .btn-sync:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ══════════════════════════════
@@ -248,6 +244,24 @@ body {
   cursor: pointer;
 }
 
+.btn-verify-all {
+  padding: 9px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 9px;
+  color: var(--text2);
+  font-size: 0.82rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-verify-all:hover { border-color: var(--blue); color: var(--blue); }
+.btn-verify-all:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .btn-add {
   padding: 9px 18px;
   background: var(--accent);
@@ -293,8 +307,11 @@ body {
   border-color: var(--border2);
   box-shadow: 0 8px 28px rgba(0,0,0,0.45);
 }
-.card.done { border-color: rgba(34,197,94,0.22); }
+.card.done      { border-color: rgba(34,197,94,0.22); }
 .card.done:hover { border-color: rgba(34,197,94,0.45); }
+/* Cartão esgotado: borda vermelha sutil e leve opacidade */
+.card.esgotado  { border-color: rgba(239,68,68,0.22); opacity: 0.78; }
+.card.esgotado:hover { opacity: 1; border-color: rgba(239,68,68,0.45); }
 
 .card-img {
   height: 185px;
@@ -310,6 +327,8 @@ body {
 }
 .card:hover .card-img img { transform: scale(1.04); }
 
+/* Badge de preço — sempre na cor padrão, sem "changed"
+   pois a API de afiliados não garante rastreamento de mudança de preço */
 .price-badge {
   position: absolute;
   bottom: 8px; right: 8px;
@@ -336,6 +355,28 @@ body {
 .status-badge.pendente { background: rgba(0,0,0,0.5); color: var(--text2); }
 .status-badge.feito    { background: rgba(34,197,94,0.8); color: white; }
 
+/*
+  Badge de estoque no canto inferior-esquerdo da imagem.
+  Apenas 3 estados possíveis:
+    sim  = produto encontrado na API → em estoque
+    não  = produto não encontrado na API → esgotado/removido
+    (vazio) = nunca verificado → não exibido
+*/
+.stock-badge {
+  position: absolute;
+  bottom: 8px; left: 8px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  backdrop-filter: blur(4px);
+}
+.stock-badge.sim { background: rgba(34,197,94,0.82); color: white; }
+.stock-badge.nao { background: rgba(239,68,68,0.85); color: white; }
+/* estado "nv" (não verificado) não mostra badge na imagem */
+
 .card-body { padding: 0.9rem; }
 
 .card-meta {
@@ -343,15 +384,16 @@ body {
   align-items: center;
   gap: 7px;
   margin-bottom: 7px;
+  flex-wrap: wrap;
 }
 .prio-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
 }
-.prio-dot.alta   { background: var(--red);    box-shadow: 0 0 5px rgba(239,68,68,0.6); }
-.prio-dot.media  { background: var(--yellow); box-shadow: 0 0 5px rgba(245,158,11,0.6); }
-.prio-dot.baixa  { background: var(--blue);   box-shadow: 0 0 5px rgba(96,165,250,0.6); }
+.prio-dot.alta  { background: var(--red);    box-shadow: 0 0 5px rgba(239,68,68,0.6); }
+.prio-dot.media { background: var(--yellow); box-shadow: 0 0 5px rgba(245,158,11,0.6); }
+.prio-dot.baixa { background: var(--blue);   box-shadow: 0 0 5px rgba(96,165,250,0.6); }
 
 .cat-tag {
   font-size: 0.67rem;
@@ -363,9 +405,29 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 140px;
+  max-width: 120px;
 }
 .cat-tag.empty { opacity: 0.35; }
+
+/*
+  Indicador de estoque inline na meta row do card.
+  3 estados:
+    sim  = verde "Em estoque"
+    não  = vermelho "Esgotado"
+    nv   = cinza "N/V" (não verificado)
+*/
+.est-dot {
+  font-size: 0.64rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  margin-left: auto;
+}
+.est-dot.sim { background: var(--green-dim); color: var(--green);   border: 1px solid rgba(34,197,94,0.2); }
+.est-dot.nao { background: rgba(239,68,68,0.10); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+.est-dot.nv  { background: var(--surface3);  color: var(--muted);   border: 1px solid var(--border2); }
 
 .card-title {
   font-size: 0.84rem;
@@ -433,20 +495,34 @@ body {
   text-decoration: none;
   flex-shrink: 0;
 }
-.btn-ico:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ico:hover     { border-color: var(--accent); color: var(--accent); }
 .btn-ico.del:hover { border-color: var(--red); color: var(--red); }
 
-/* ── Empty / Loading ── */
-.empty-state {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 4rem 2rem;
-  color: var(--muted);
+/* Botão verificar estoque no card — 4 estados visuais */
+.btn-verify {
+  width: 31px; height: 31px;
+  border-radius: 7px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  position: relative;
 }
-.empty-state .ei { font-size: 2.5rem; margin-bottom: 0.8rem; opacity: 0.4; }
-.empty-state h3 { font-size: 1rem; color: var(--text2); margin-bottom: 0.4rem; }
-.empty-state p { font-size: 0.82rem; }
+.btn-verify:hover       { border-color: var(--blue);  color: var(--blue); }
+.btn-verify.checking    { border-color: var(--blue);  color: var(--blue); }
+.btn-verify.checking .vi { display: inline-block; animation: rot 0.65s linear infinite; }
+/* ok = em estoque (sim) */
+.btn-verify.ok  { border-color: rgba(34,197,94,0.6); color: var(--green); }
+/* err = esgotado (não) */
+.btn-verify.err { border-color: rgba(239,68,68,0.6); color: var(--red); }
 
+/* ── Skeleton ── */
 .card-skeleton {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -454,7 +530,7 @@ body {
   overflow: hidden;
   animation: shimmer 1.4s ease-in-out infinite;
 }
-.skel-img { height: 185px; background: var(--surface2); }
+.skel-img  { height: 185px; background: var(--surface2); }
 .skel-body { padding: 0.9rem; }
 .skel-line {
   height: 11px;
@@ -464,10 +540,18 @@ body {
 }
 .skel-line.s60 { width: 60%; }
 .skel-line.s40 { width: 40%; }
-@keyframes shimmer {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.55; }
+@keyframes shimmer { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+/* ── Empty state ── */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
 }
+.empty-state .ei { font-size: 2.5rem; margin-bottom: 0.8rem; opacity: 0.4; }
+.empty-state h3  { font-size: 1rem; color: var(--text2); margin-bottom: 0.4rem; }
+.empty-state p   { font-size: 0.82rem; }
 
 /* ══════════════════════════════
    DETAIL PANEL
@@ -496,7 +580,6 @@ body {
   justify-content: space-between;
   flex-shrink: 0;
 }
-
 .btn-back {
   display: flex; align-items: center; gap: 5px;
   padding: 6px 12px;
@@ -525,8 +608,7 @@ body {
 .btn-del-panel:hover { background: rgba(239,68,68,0.15); }
 
 .panel-img {
-  width: 100%;
-  height: 195px;
+  width: 100%; height: 195px;
   object-fit: cover;
   flex-shrink: 0;
   background: var(--surface2);
@@ -547,20 +629,11 @@ body {
   color: var(--accent);
   margin-bottom: 5px;
 }
-.panel-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.45;
-  margin-bottom: 8px;
-}
+.panel-title { font-size: 0.95rem; font-weight: 600; line-height: 1.45; margin-bottom: 8px; }
 .panel-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.76rem;
-  color: var(--blue);
-  text-decoration: none;
-  margin-bottom: 1.25rem;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.76rem; color: var(--blue);
+  text-decoration: none; margin-bottom: 1.25rem;
 }
 .panel-link:hover { text-decoration: underline; }
 
@@ -573,12 +646,73 @@ body {
   margin-top: 1.1rem;
 }
 
-/* Status buttons */
-.panel-status-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 7px;
+/*
+  Seção de estoque no painel — exibe o status atual e botão para verificar.
+  
+  Nota sobre limitação da API:
+    A API de afiliados da Shopee informa apenas SE o produto está disponível
+    (aparece nos resultados) ou não. Não há campo de quantidade.
+*/
+.panel-stock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 9px;
+  padding: 10px 12px;
+  gap: 10px;
 }
+.panel-stock-info { display: flex; align-items: center; gap: 8px; }
+.panel-stock-label { font-size: 0.84rem; color: var(--text); font-weight: 500; }
+.panel-stock-sub   { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+/* Badge de estoque dentro do painel — mesmo 3 estados */
+.panel-stock-badge {
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+.panel-stock-badge.sim { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+.panel-stock-badge.nao { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+.panel-stock-badge.nv  { background: var(--surface3); color: var(--muted); border: 1px solid var(--border2); }
+
+.btn-verify-panel {
+  padding: 7px 13px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  color: var(--text2);
+  font-size: 0.78rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.btn-verify-panel:hover    { border-color: var(--blue); color: var(--blue); }
+.btn-verify-panel:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Nota informativa sobre limitação da API */
+.stock-api-note {
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: var(--surface3);
+  border-radius: 6px;
+  border-left: 2px solid var(--border2);
+}
+
+/* Status buttons */
+.panel-status-row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .btn-ps {
   padding: 9px;
   border-radius: 8px;
@@ -592,14 +726,10 @@ body {
   transition: all 0.15s;
 }
 .btn-ps.active-pend { border-color: rgba(255,92,53,0.5); background: var(--accent-dim); color: var(--accent); }
-.btn-ps.active-done { border-color: rgba(34,197,94,0.5); background: var(--green-dim); color: var(--green); }
+.btn-ps.active-done { border-color: rgba(34,197,94,0.5); background: var(--green-dim);  color: var(--green); }
 
 /* Priority buttons */
-.panel-prio-row {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 6px;
-}
+.panel-prio-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
 .btn-pp {
   padding: 7px;
   border-radius: 7px;
@@ -664,9 +794,9 @@ body {
   cursor: pointer;
   transition: all 0.15s;
 }
-.btn-save-comment:hover { border-color: var(--accent); color: var(--accent); }
+.btn-save-comment:hover    { border-color: var(--accent); color: var(--accent); }
 .btn-save-comment:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-save-comment.saved { border-color: rgba(34,197,94,0.5); color: var(--green); }
+.btn-save-comment.saved    { border-color: rgba(34,197,94,0.5); color: var(--green); }
 
 .panel-meta-row {
   display: flex;
@@ -675,11 +805,7 @@ body {
   color: var(--muted);
   margin-bottom: 3px;
 }
-.panel-meta-val {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--text2);
-}
+.panel-meta-val { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--text2); }
 
 /* ══════════════════════════════
    OVERLAY
@@ -719,16 +845,11 @@ body {
 }
 @keyframes popIn {
   from { opacity:0; transform: scale(0.95) translateY(10px); }
-  to   { opacity:1; transform: scale(1) translateY(0); }
+  to   { opacity:1; transform: scale(1)    translateY(0); }
 }
 
-.modal-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 1.2rem;
-  margin-bottom: 0.3rem;
-}
-.modal-sub { color: var(--text2); font-size: 0.82rem; margin-bottom: 1.4rem; }
+.modal-title  { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.2rem; margin-bottom: 0.3rem; }
+.modal-sub    { color: var(--text2); font-size: 0.82rem; margin-bottom: 1.4rem; }
 
 .form-grp { margin-bottom: 1rem; }
 .form-lbl {
@@ -754,18 +875,9 @@ body {
 }
 .form-inp:focus { border-color: var(--accent); }
 
-.modal-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+.modal-row    { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.4rem; }
 
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 1.4rem;
-}
 .btn-cancel {
   padding: 9px 18px;
   background: transparent;
@@ -778,6 +890,7 @@ body {
   transition: all 0.15s;
 }
 .btn-cancel:hover { color: var(--text); border-color: var(--text2); }
+
 .btn-submit {
   padding: 9px 22px;
   background: var(--accent);
@@ -793,10 +906,97 @@ body {
   align-items: center;
   gap: 7px;
 }
-.btn-submit:hover { background: #ff6c45; }
+.btn-submit:hover    { background: #ff6c45; }
 .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* Spinner */
+/* ══════════════════════════════
+   PROGRESS MODAL (verificação em lote)
+══════════════════════════════ */
+.progress-modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: none;
+  place-items: center;
+}
+.progress-modal.open { display: grid; }
+
+.progress-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 470px;
+  padding: 1.8rem;
+  animation: popIn 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+}
+.progress-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; }
+
+.progress-bar-outer {
+  height: 5px;
+  background: var(--surface3);
+  border-radius: 3px;
+  margin-bottom: 0.55rem;
+  overflow: hidden;
+}
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #ff8c6a);
+  border-radius: 3px;
+  transition: width 0.35s ease;
+  width: 0%;
+}
+
+.progress-count { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--text2); margin-bottom: 0.9rem; }
+
+.progress-items {
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 1rem;
+}
+.progress-items::-webkit-scrollbar { width: 3px; }
+.progress-items::-webkit-scrollbar-thumb { background: var(--border2); }
+
+.progress-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  background: var(--surface2);
+  font-size: 0.75rem;
+  border-left: 2px solid var(--border2);
+  transition: border-color 0.2s;
+}
+.progress-item .p-ico  { font-size: 0.82rem; flex-shrink: 0; min-width: 14px; text-align: center; }
+.progress-item .p-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text2); }
+.progress-item .p-stat { font-size: 0.68rem; flex-shrink: 0; color: var(--muted); }
+/* p-ok = em estoque */
+.progress-item.p-ok    { border-left-color: var(--green); }
+.progress-item.p-ok .p-stat   { color: var(--green); }
+/* p-err = esgotado */
+.progress-item.p-err   { border-left-color: var(--red); }
+.progress-item.p-err .p-stat  { color: var(--red); }
+/* p-doing = verificando agora */
+.progress-item.p-doing { border-left-color: var(--blue); }
+.progress-item.p-doing .p-ico { animation: rot 0.65s linear infinite; display: inline-block; }
+
+.progress-summary { font-size: 0.82rem; color: var(--text2); min-height: 1.2em; margin-bottom: 1rem; }
+
+.progress-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* ── Spinner ── */
 .spin {
   width: 13px; height: 13px;
   border: 2px solid rgba(255,255,255,0.3);
@@ -824,31 +1024,32 @@ body {
   pointer-events: none;
   white-space: nowrap;
 }
-#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
 #toast.success { background: #132a1c; border: 1px solid rgba(34,197,94,0.35); color: var(--green); }
 #toast.error   { background: #2a1313; border: 1px solid rgba(239,68,68,0.35); color: var(--red); }
 #toast.info    { background: var(--surface2); border: 1px solid var(--border2); color: var(--text); }
+#toast.warn    { background: #2a2010; border: 1px solid rgba(245,158,11,0.35); color: var(--yellow); }
 </style>
 </head>
 <body>
 
-<div id="login-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 9999; display: flex; align-items: center; justify-content: center; font-family: sans-serif;">
-  <div style="background: #1e1e1e; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; color: white;">
-    <h2 style="margin-bottom: 1.5rem; color: #ff4a00;">Shopee Planner Login</h2>
-    
-    <input type="email" id="login-email" placeholder="E-mail" style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #333; background: #252525; color: white; box-sizing: border-box;">
-    
-    <input type="password" id="login-password" placeholder="Senha" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 6px; border: 1px solid #333; background: #252525; color: white; box-sizing: border-box;">
-    
-    <button onclick="realizarLogin()" id="btn-login" style="width: 100%; padding: 12px; border-radius: 6px; border: none; background: #ff4a00; color: white; font-weight: bold; cursor: pointer;">Entrar</button>
-    
-    <p id="login-erro" style="color: #ff4444; font-size: 0.9rem; margin-top: 15px; display: none;">Credenciais incorretas!</p>
+<!-- ════ LOGIN ════ -->
+<div id="login-overlay" style="position:fixed;inset:0;background:#0c0e12;z-index:9999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;">
+  <div style="background:#12151b;padding:2.2rem;border-radius:14px;border:1px solid #252b35;box-shadow:0 20px 60px rgba(0,0,0,0.6);width:100%;max-width:350px;text-align:center;color:white;">
+    <div style="width:40px;height:40px;background:#ff5c35;border-radius:10px;margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">📦</div>
+    <h2 style="margin-bottom:0.4rem;font-family:'Syne',sans-serif;font-size:1.25rem;">Products<span style="color:#ff5c35">Plan.</span></h2>
+    <p style="color:#46526a;font-size:0.78rem;margin-bottom:1.6rem;">Acesso restrito</p>
+    <input type="email" id="login-email" placeholder="E-mail" style="width:100%;padding:11px 13px;margin-bottom:9px;border-radius:8px;border:1px solid #252b35;background:#181c24;color:white;font-size:0.85rem;outline:none;box-sizing:border-box;">
+    <input type="password" id="login-password" placeholder="Senha" style="width:100%;padding:11px 13px;margin-bottom:18px;border-radius:8px;border:1px solid #252b35;background:#181c24;color:white;font-size:0.85rem;outline:none;box-sizing:border-box;">
+    <button onclick="realizarLogin()" id="btn-login" style="width:100%;padding:11px;border-radius:8px;border:none;background:#ff5c35;color:white;font-weight:700;font-size:0.9rem;cursor:pointer;">Entrar</button>
+    <p id="login-erro" style="color:#ef4444;font-size:0.8rem;margin-top:12px;display:none;">Credenciais incorretas.</p>
   </div>
 </div>
 
 <!-- ════ SIDEBAR ════ -->
 <aside class="sidebar">
   <div class="sidebar-logo">
+    <div class="icon">📦</div>
     Products<span class="sub">Plan.</span>
   </div>
 
@@ -868,6 +1069,7 @@ body {
   </div>
 
   <div class="sidebar-scroll">
+
     <div class="sidebar-section">
       <div class="section-label">Status</div>
       <div id="statusBtns">
@@ -882,6 +1084,28 @@ body {
         <button class="filter-btn" data-sv="feito" onclick="setFiltroStatus('feito')">
           <span class="fdot" style="background:var(--green)"></span> Feito
           <span class="fcount" id="cFeito">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Estoque</div>
+      <div id="estoqueBtns">
+        <button class="filter-btn active" data-ev="todos-est" onclick="setFiltroEstoque('todos-est')">
+          <span class="fdot" style="background:var(--border2)"></span> Todos
+          <span class="fcount" id="ceAll">0</span>
+        </button>
+        <button class="filter-btn" data-ev="sim" onclick="setFiltroEstoque('sim')">
+          <span class="fdot" style="background:var(--green)"></span> Em estoque
+          <span class="fcount" id="ceSim">0</span>
+        </button>
+        <button class="filter-btn" data-ev="não" onclick="setFiltroEstoque('não')">
+          <span class="fdot" style="background:var(--red)"></span> Esgotado
+          <span class="fcount" id="ceNao">0</span>
+        </button>
+        <button class="filter-btn" data-ev="nv" onclick="setFiltroEstoque('nv')">
+          <span class="fdot" style="background:var(--muted)"></span> Não verificado
+          <span class="fcount" id="ceNV">0</span>
         </button>
       </div>
     </div>
@@ -912,6 +1136,7 @@ body {
       <div class="section-label">Categorias</div>
       <div id="catBtns"></div>
     </div>
+
   </div>
 
   <div class="sidebar-bottom">
@@ -939,6 +1164,9 @@ body {
       <option value="preco-desc">R$ Maior preço</option>
       <option value="prioridade">⚑ Prioridade</option>
     </select>
+    <button class="btn-verify-all" id="btnVerifyAll" onclick="verificarTodos()" title="Verificar disponibilidade de todos os produtos na API Shopee">
+      <span id="vaIco">⟳</span> Verificar todos
+    </button>
     <button class="btn-add" onclick="abrirModal()">+ Novo Produto</button>
   </header>
 
@@ -954,7 +1182,7 @@ body {
 <div class="detail-panel" id="detailPanel">
   <div class="panel-head">
     <button class="btn-back" onclick="fecharPainel()">← Voltar</button>
-    <button class="btn-del-panel" onclick="deletarAtual()">Excluir produto</button>
+    <button class="btn-del-panel" onclick="deletarAtual()">Excluir</button>
   </div>
   <img class="panel-img" id="panelImg" src="" alt="">
   <div class="panel-body">
@@ -966,6 +1194,29 @@ body {
     <div class="panel-status-row">
       <button class="btn-ps" id="btnPend" onclick="setStatus('pendente')">○ Pendente</button>
       <button class="btn-ps" id="btnDone" onclick="setStatus('feito')">✓ Feito</button>
+    </div>
+
+    <div class="panel-sec">Estoque</div>
+    <div class="panel-stock-row">
+      <div class="panel-stock-info">
+        <div>
+          <div class="panel-stock-label">Disponibilidade</div>
+          <div class="panel-stock-sub" id="panelVerifTime">Nunca verificado</div>
+        </div>
+        <span class="panel-stock-badge nv" id="panelStockBadge">○ N/V</span>
+      </div>
+      <button class="btn-verify-panel" id="btnVerifyPanel" onclick="verificarPainelAtual()">
+        <span id="vpIco">⟳</span> Verificar
+      </button>
+    </div>
+    <!--
+      Nota: a API de afiliados da Shopee indica apenas se o produto está
+      disponível (encontrado nos resultados) ou não. Quantidade exata não
+      é informada pela API.
+    -->
+    <div class="stock-api-note">
+      A verificação indica se o produto está disponível na Shopee.<br>
+      Quantidade exata não é fornecida pela API de afiliados.
     </div>
 
     <div class="panel-sec">Prioridade</div>
@@ -989,7 +1240,7 @@ body {
     </select>
 
     <div class="panel-sec">Comentário</div>
-    <textarea class="panel-textarea" id="panelComment" placeholder="Adicione notas, comparações ou lembretes sobre este produto..."></textarea>
+    <textarea class="panel-textarea" id="panelComment" placeholder="Notas, comparações ou lembretes..."></textarea>
     <button class="btn-save-comment" id="btnSaveComment" onclick="salvarComentario()">Salvar comentário</button>
 
     <div class="panel-sec" style="margin-top:1.4rem">Informações</div>
@@ -1004,31 +1255,24 @@ body {
 <div class="modal-wrap" id="modal">
   <div class="modal-box">
     <div class="modal-title">Novo Produto</div>
-    <div class="modal-sub">Cole o link da Shopee — o script vai buscar os dados automaticamente.</div>
-
+    <div class="modal-sub">Cole o link da Shopee — o script busca os dados automaticamente.</div>
     <div class="form-grp">
       <label class="form-lbl">Link do produto *</label>
       <input class="form-inp" id="inputLink" type="url" placeholder="https://shopee.com.br/...">
     </div>
-
     <div class="form-grp">
-      <label class="form-lbl">Título <span style="opacity:.45;font-weight:400;text-transform:none;letter-spacing:0">(opcional — preenchido automaticamente pela API)</span></label>
+      <label class="form-lbl">Título <span style="opacity:.45;font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
       <input class="form-inp" id="inputTitulo" type="text" placeholder="Deixe em branco para usar o título da Shopee...">
     </div>
-
     <div class="modal-row">
       <div class="form-grp">
         <label class="form-lbl">Categoria</label>
         <select class="form-inp" id="inputCat">
           <option value="">— Nenhuma —</option>
-          <option value="Eletrônicos">Eletrônicos</option>
-          <option value="Casa & Decoração">Casa & Decoração</option>
-          <option value="Moda">Moda</option>
-          <option value="Beleza">Beleza</option>
-          <option value="Esporte">Esporte</option>
-          <option value="Bebê & Infantil">Bebê & Infantil</option>
-          <option value="Alimentação">Alimentação</option>
-          <option value="Outro">Outro</option>
+          <option>Eletrônicos</option><option>Casa & Decoração</option>
+          <option>Moda</option><option>Beleza</option>
+          <option>Esporte</option><option>Bebê & Infantil</option>
+          <option>Alimentação</option><option>Outro</option>
         </select>
       </div>
       <div class="form-grp">
@@ -1040,7 +1284,6 @@ body {
         </select>
       </div>
     </div>
-
     <div class="modal-actions">
       <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
       <button class="btn-submit" id="btnSubmit" onclick="salvarNovoProduto()">
@@ -1050,69 +1293,82 @@ body {
   </div>
 </div>
 
+<!-- ════ PROGRESS MODAL (verificação em lote) ════ -->
+<div class="progress-modal" id="progressModal">
+  <div class="progress-box">
+    <div class="progress-header">
+      <div class="progress-title">Verificando disponibilidade</div>
+      <span style="font-size:0.75rem;color:var(--muted)">via Shopee API</span>
+    </div>
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner" id="progressBarInner"></div>
+    </div>
+    <div class="progress-count" id="progressCount">0 / 0</div>
+    <div class="progress-items" id="progressItems"></div>
+    <div class="progress-summary" id="progressSummary"></div>
+    <div class="progress-actions">
+      <button class="btn-cancel" id="btnCancelarLote" onclick="cancelarVerificacao()">Cancelar</button>
+      <button class="btn-submit" id="btnFecharProgress" style="display:none" onclick="fecharProgressModal()">
+        Concluído ✓
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────────────────────
+// ── CONFIG ────────────────────────────────────────────────────────────────────
 const API_URL = "https://script.google.com/macros/s/AKfycbwO7BQje-TFZ1IXTwAk69PR8kAe74hHb2KV4jY-iNLAUzv-cAbDO0aHiItO9goLMENnfw/exec";
 
-// ── STATE ───────────────────────────────────────────────────────────────────
-let db          = [];          // all products
-let atual       = null;        // product open in panel
-let filtroSt    = 'todos';     // status filter
-let filtroPrio  = 'todos-prio';// priority filter
-let filtroCat   = null;        // category filter
-let syncing     = false;
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let db           = [];
+let atual        = null;
+let filtroSt     = 'todos';
+let filtroPrio   = 'todos-prio';
+let filtroCat    = null;
+let filtroEst    = 'todos-est';
+let syncing      = false;
+let cancelarLote = false;
 
-// ── BOOT & LOGIN ────────────────────────────────────────────────────────────
-
-// 1. Verifica se a sessão já existe ao abrir a página
+// ── BOOT & LOGIN ──────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  const savedKey = sessionStorage.getItem("auth_key");
-  if (savedKey === "netinho2007") {
-    document.getElementById("login-overlay").style.display = "none";
-    carregarDados(); // Se já tem o login salvo, carrega o banco de dados
-  } else {
-    document.body.style.overflow = 'hidden'; // Trava a rolagem até logar
+  const key = sessionStorage.getItem('auth_key');
+  if (key === ADMIN_PASS_LOCAL()) {
+    document.getElementById('login-overlay').style.display = 'none';
+    carregarDados();
   }
 });
 
-// 2. Função acionada ao clicar em "Entrar"
+function ADMIN_PASS_LOCAL() { return 'netinho2007'; }
+
 async function realizarLogin() {
-  const email = document.getElementById("login-email").value;
-  const password = document.getElementById("login-password").value;
-  const btn = document.getElementById("btn-login");
-  const erroMsg = document.getElementById("login-erro");
+  const email    = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const btn      = document.getElementById('btn-login');
+  const erroMsg  = document.getElementById('login-erro');
+  btn.innerText  = 'Verificando...';
+  btn.disabled   = true;
+  erroMsg.style.display = 'none';
 
-  btn.innerText = "Verificando...";
-  btn.disabled = true;
-  erroMsg.style.display = "none";
-
-  // Validação direta baseada nas suas credenciais
-  if (email === "antoniotristaoneto2007@gmail.com" && password === "netinho2007") {
-    sessionStorage.setItem("auth_key", password);
-    document.getElementById("login-overlay").style.display = "none";
-    document.body.style.overflow = 'auto'; // Destrava a rolagem
-    
-    carregarDados(); // Dispara o carregamento dos produtos
+  if (email === 'antoniotristaoneto2007@gmail.com' && password === ADMIN_PASS_LOCAL()) {
+    sessionStorage.setItem('auth_key', ADMIN_PASS_LOCAL());
+    document.getElementById('login-overlay').style.display = 'none';
+    carregarDados();
   } else {
-    erroMsg.style.display = "block";
-    btn.innerText = "Entrar";
-    btn.disabled = false;
+    erroMsg.style.display = 'block';
+    btn.innerText  = 'Entrar';
+    btn.disabled   = false;
   }
 }
 
-// Modal: close on backdrop click
+// Modal: backdrop click / keyboard
 document.getElementById('modal').addEventListener('click', e => {
   if (e.target === e.currentTarget) fecharModal();
 });
-
-// Enter key in link input
 document.getElementById('inputLink').addEventListener('keydown', e => {
   if (e.key === 'Enter') salvarNovoProduto();
 });
-
-// Escape: close panel / modal
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('modal').classList.contains('open')) fecharModal();
@@ -1120,20 +1376,15 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ── LOAD DATA ───────────────────────────────────────────────────────────────
+// ── LOAD DATA ─────────────────────────────────────────────────────────────────
 async function carregarDados() {
   if (syncing) return;
-  
-  // Resgata a chave de acesso antes de fazer a requisição
-  const key = sessionStorage.getItem("auth_key");
-  if (!key) return; // Se não tiver chave, cancela a ação por segurança
-
+  const key = sessionStorage.getItem('auth_key');
+  if (!key) return;
   syncing = true;
   setSyncUI(true);
   renderSkeleton();
-
   try {
-    // Injeta a chave na URL para o Google Script liberar os dados
     const res  = await fetch(`${API_URL}?action=listar&key=${key}`);
     const data = await res.json();
     db = (data.produtos || []).map(normalizar);
@@ -1150,35 +1401,33 @@ async function carregarDados() {
 }
 
 function normalizar(p) {
-  function sem(str) {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  }
-
+  function sem(str) { return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
   const flat = {};
   Object.keys(p).forEach(k => { flat[sem(k)] = p[k]; });
-
   function lookup(canonical, fallback = '') {
-    const val = p[canonical];
-    if (val !== undefined && val !== null && val !== '') return val;
-    const val2 = flat[sem(canonical)];
-    if (val2 !== undefined && val2 !== null && val2 !== '') return val2;
+    const v = p[canonical];
+    if (v !== undefined && v !== null && v !== '') return v;
+    const v2 = flat[sem(canonical)];
+    if (v2 !== undefined && v2 !== null && v2 !== '') return v2;
     return fallback;
   }
-
   return {
     ...p,
-    'Título':     lookup('Título'),
-    'Preço':      lookup('Preço'),
-    'Imagem':     lookup('Imagem'),
-    'Link':       lookup('Link'),
-    'ID':         lookup('ID'),
-    'Data':       lookup('Data'),
-    'ShopId':     lookup('ShopId'),
-    'ItemId':     lookup('ItemId'),
-    'Status':     lookup('Status')     || 'pendente',
-    'Comentário': lookup('Comentário') || '',
-    'Categoria':  lookup('Categoria')  || '',
-    'Prioridade': lookup('Prioridade') || 'média',
+    'Título':      lookup('Título'),
+    'Preço':       lookup('Preço'),
+    'Imagem':      lookup('Imagem'),
+    'Link':        lookup('Link'),
+    'ID':          lookup('ID'),
+    'Data':        lookup('Data'),
+    'ShopId':      lookup('ShopId'),
+    'ItemId':      lookup('ItemId'),
+    'Status':      lookup('Status')      || 'pendente',
+    'Comentário':  lookup('Comentário')  || '',
+    'Categoria':   lookup('Categoria')   || '',
+    'Prioridade':  lookup('Prioridade')  || 'média',
+    // Estoque: "sim" | "não" | "" (não verificado)
+    'Estoque':     lookup('Estoque')     || '',
+    'UltimaVerif': lookup('UltimaVerif') || '',
   };
 }
 
@@ -1189,7 +1438,7 @@ function setSyncUI(on) {
   ico.style.animation = on ? 'rot 0.65s linear infinite' : '';
 }
 
-// ── RENDER ───────────────────────────────────────────────────────────────────
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function renderSkeleton() {
   document.getElementById('grid').innerHTML = Array(8).fill(0).map(() => `
     <div class="card-skeleton">
@@ -1214,6 +1463,14 @@ function aplicarFiltros() {
   if (filtroCat !== null)
     lista = lista.filter(p => p['Categoria'] === filtroCat);
 
+  // Filtro de estoque — apenas 3 estados possíveis
+  if (filtroEst === 'sim')
+    lista = lista.filter(p => p['Estoque'] === 'sim');
+  else if (filtroEst === 'não')
+    lista = lista.filter(p => p['Estoque'] === 'não');
+  else if (filtroEst === 'nv')
+    lista = lista.filter(p => !p['Estoque'] || p['Estoque'] === '');
+
   const q = document.getElementById('searchInput').value.toLowerCase();
   if (q)
     lista = lista.filter(p =>
@@ -1222,7 +1479,6 @@ function aplicarFiltros() {
     );
 
   lista = sortear(lista, document.getElementById('sortSelect').value);
-
   renderGrid(lista);
 }
 
@@ -1236,6 +1492,21 @@ function sortear(lista, crit) {
     case 'prioridade': return arr.sort((a,b) => (pm[b['Prioridade']]||2) - (pm[a['Prioridade']]||2));
     default:           return arr;
   }
+}
+
+/*
+  Helper para o indicador de estoque.
+  Retorna classe CSS e texto para cada estado.
+  
+  Estados possíveis vindos da API:
+    "sim"  → produto encontrado na API afiliados → disponível
+    "não"  → produto não encontrado na API afiliados → esgotado/removido
+    ""     → nunca verificado
+*/
+function estInfo(est) {
+  if (est === 'sim') return { cls: 'sim', txt: '● Em estoque' };
+  if (est === 'não') return { cls: 'nao', txt: '✕ Esgotado'  };
+  return { cls: 'nv', txt: '○ N/V' };
 }
 
 function renderGrid(lista) {
@@ -1253,38 +1524,49 @@ function renderGrid(lista) {
 }
 
 function cardHtml(p) {
-  const status  = p['Status']    || 'pendente';
-  const prio    = p['Prioridade']|| 'média';
-  const cat     = p['Categoria'] || '';
-  const coment  = p['Comentário']|| '';
+  const status  = p['Status']     || 'pendente';
+  const prio    = p['Prioridade'] || 'média';
+  const cat     = p['Categoria']  || '';
+  const coment  = p['Comentário'] || '';
+  const est     = p['Estoque']    || '';    // "sim" | "não" | ""
   const feito   = status === 'feito';
   const id      = esc(p['ID']);
   const titulo  = esc(p['Título'] || 'Sem título');
   const img     = p['Imagem'] || 'https://placehold.co/300x190/181c24/46526a?text=Sem+Imagem';
   const link    = p['Link'] || '#';
   const prioCls = prio === 'média' ? 'media' : prio;
+  const ei      = estInfo(est);
+
+  // Classe do card:
+  //   "done"     → produto marcado como feito
+  //   "esgotado" → produto verificado como indisponível na API
+  //   ""         → padrão (pendente ou não verificado)
+  const cardCls = feito ? 'done' : (est === 'não' ? 'esgotado' : '');
 
   return `
-  <div class="card ${feito ? 'done' : ''}" id="c-${id}">
+  <div class="card ${cardCls}" id="c-${id}">
     <div class="card-img" onclick="abrirPainel('${id}')">
-      <img src="${img}" alt="${titulo}" loading="lazy" onerror="this.src='https://placehold.co/300x190/181c24/46526a?text=Imagem+indisponível'">
+      <img src="${img}" alt="${titulo}" loading="lazy"
+           onerror="this.src='https://placehold.co/300x190/181c24/46526a?text=Sem+Imagem'">
       <div class="price-badge">${fmtMoeda(p['Preço'])}</div>
       <div class="status-badge ${feito ? 'feito' : 'pendente'}">${feito ? '✓ Feito' : '● Pend.'}</div>
+      ${est === 'sim' ? `<div class="stock-badge sim">● Disponível</div>` : ''}
+      ${est === 'não' ? `<div class="stock-badge nao">✕ Esgotado</div>` : ''}
     </div>
     <div class="card-body">
       <div class="card-meta">
         <span class="prio-dot ${prioCls}" title="Prioridade ${prio}"></span>
         <span class="cat-tag ${cat ? '' : 'empty'}">${cat || 'Sem categoria'}</span>
+        <span class="est-dot ${ei.cls}" title="Estoque: ${est || 'não verificado'}">${ei.txt}</span>
       </div>
       <div class="card-title" onclick="abrirPainel('${id}')" title="${titulo}">${titulo}</div>
       <div class="card-comment ${coment ? '' : 'empty'}">${coment ? '💬 ' + esc(coment) : 'Sem comentário'}</div>
       <div class="card-actions">
         <button class="btn-toggle ${feito ? 'feito' : ''}"
-          onclick="toggleStatus(event,'${id}')"
-          title="${feito ? 'Marcar como pendente' : 'Marcar como feito'}">
-          ${feito ? '✓ Feito' : '○ Marcar feito'}
-        </button>
-        <a class="btn-ico" href="${link}" target="_blank" title="Abrir link afiliado" onclick="event.stopPropagation()">↗</a>
+          onclick="toggleStatus(event,'${id}')">${feito ? '✓ Feito' : '○ Marcar feito'}</button>
+        <button class="btn-verify" id="bv-${id}" title="Verificar disponibilidade na Shopee"
+          onclick="verificarProduto('${id}')"><span class="vi">⟳</span></button>
+        <a class="btn-ico" href="${link}" target="_blank" onclick="event.stopPropagation()" title="Abrir link afiliado">↗</a>
         <button class="btn-ico del" title="Excluir" onclick="deletarProduto(event,'${id}')">✕</button>
       </div>
     </div>
@@ -1300,22 +1582,29 @@ function refreshCard(id) {
   el.replaceWith(tmp.firstElementChild);
 }
 
-// ── SIDEBAR ──────────────────────────────────────────────────────────────────
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
 function atualizarSidebar() {
-  const total   = db.length;
-  const feitos  = db.filter(p => p['Status'] === 'feito').length;
-  const pend    = total - feitos;
+  const total  = db.length;
+  const feitos = db.filter(p => p['Status'] === 'feito').length;
+  const pend   = total - feitos;
+  // Contagem dos 3 estados de estoque
+  const emEst  = db.filter(p => p['Estoque'] === 'sim').length;
+  const esgot  = db.filter(p => p['Estoque'] === 'não').length;
+  const nv     = db.filter(p => !p['Estoque'] || p['Estoque'] === '').length;
 
   document.getElementById('sTotalNum').textContent = total;
   document.getElementById('sFeitoNum').textContent = feitos;
   document.getElementById('sPendNum').textContent  = pend;
-  document.getElementById('cTodos').textContent  = total;
-  document.getElementById('cFeito').textContent  = feitos;
-  document.getElementById('cPend').textContent   = pend;
+  document.getElementById('cTodos').textContent    = total;
+  document.getElementById('cFeito').textContent    = feitos;
+  document.getElementById('cPend').textContent     = pend;
+  document.getElementById('ceAll').textContent     = total;
+  document.getElementById('ceSim').textContent     = emEst;
+  document.getElementById('ceNao').textContent     = esgot;
+  document.getElementById('ceNV').textContent      = nv;
 
   const cats = {};
   db.forEach(p => { if (p['Categoria']) cats[p['Categoria']] = (cats[p['Categoria']] || 0) + 1; });
-
   document.getElementById('catBtns').innerHTML = `
     <button class="filter-btn ${filtroCat === null ? 'active' : ''}" onclick="setFiltroCat(null)">
       <span class="fdot" style="background:var(--border2)"></span>Todas
@@ -1334,27 +1623,27 @@ function setFiltroStatus(v) {
     b.classList.toggle('active', b.dataset.sv === v));
   aplicarFiltros();
 }
-
 function setFiltroPrio(v) {
   filtroPrio = v;
   document.querySelectorAll('#prioBtns .filter-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.pv === v));
   aplicarFiltros();
 }
-
-function setFiltroCat(v) {
-  filtroCat = v;
-  atualizarSidebar();
+function setFiltroCat(v) { filtroCat = v; atualizarSidebar(); aplicarFiltros(); }
+function setFiltroEstoque(v) {
+  filtroEst = v;
+  document.querySelectorAll('#estoqueBtns .filter-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.ev === v));
   aplicarFiltros();
 }
 
-// ── DETAIL PANEL ─────────────────────────────────────────────────────────────
+// ── DETAIL PANEL ──────────────────────────────────────────────────────────────
 function abrirPainel(id) {
   atual = db.find(p => p['ID'] === id);
   if (!atual) return;
-
   const p = atual;
-  document.getElementById('panelImg').src  = p['Imagem'] || 'https://placehold.co/400x195/181c24/46526a?text=Sem+Imagem';
+
+  document.getElementById('panelImg').src           = p['Imagem'] || 'https://placehold.co/400x195/181c24/46526a?text=Sem+Imagem';
   document.getElementById('panelTitulo').textContent = p['Título'] || 'Sem título';
   document.getElementById('panelPreco').textContent  = fmtMoeda(p['Preço']);
   document.getElementById('panelLink').href          = p['Link'] || '#';
@@ -1368,6 +1657,7 @@ function abrirPainel(id) {
 
   sincPainelStatus(p['Status']    || 'pendente');
   sincPainelPrio(p['Prioridade']  || 'média');
+  sincPainelEstoque(p['Estoque'] || '', p['UltimaVerif'] || '');
 
   document.getElementById('detailPanel').classList.add('open');
   document.getElementById('overlay').classList.add('show');
@@ -1383,14 +1673,225 @@ function sincPainelStatus(s) {
   document.getElementById('btnPend').className = 'btn-ps' + (s === 'pendente' ? ' active-pend' : '');
   document.getElementById('btnDone').className = 'btn-ps' + (s === 'feito'    ? ' active-done' : '');
 }
-
 function sincPainelPrio(p) {
   document.getElementById('ppBaixa').className = 'btn-pp' + (p === 'baixa' ? ' act-baixa' : '');
   document.getElementById('ppMedia').className = 'btn-pp' + (p === 'média' ? ' act-media' : '');
   document.getElementById('ppAlta').className  = 'btn-pp' + (p === 'alta'  ? ' act-alta'  : '');
 }
 
-// ── API ACTIONS ──────────────────────────────────────────────────────────────
+/*
+  Atualiza a seção de estoque no painel lateral.
+  
+  Estados do parâmetro 'est':
+    "sim"  → produto encontrado na API → exibe badge verde "Em estoque"
+    "não"  → produto não encontrado na API → exibe badge vermelho "Esgotado"
+    ""     → nunca verificado → exibe badge cinza "N/V"
+*/
+function sincPainelEstoque(est, verif) {
+  const badge = document.getElementById('panelStockBadge');
+  const sub   = document.getElementById('panelVerifTime');
+
+  if (est === 'sim') {
+    badge.className   = 'panel-stock-badge sim';
+    badge.textContent = '● Em estoque';
+  } else if (est === 'não') {
+    badge.className   = 'panel-stock-badge nao';
+    badge.textContent = '✕ Esgotado';
+  } else {
+    badge.className   = 'panel-stock-badge nv';
+    badge.textContent = '○ Não verificado';
+  }
+
+  sub.textContent = verif ? 'Verificado: ' + verif : 'Nunca verificado';
+}
+
+// ── SINGLE PRODUCT VERIFICATION ───────────────────────────────────────────────
+/*
+  Verifica a disponibilidade de um produto na API de afiliados da Shopee.
+  
+  A API indica disponibilidade pela presença ou ausência do produto nos nodes:
+    - Produto nos nodes → ativo = true  → estoque = "sim"
+    - Produto ausente   → ativo = false → estoque = "não"
+  
+  Não há dado de quantidade; apenas disponível/indisponível.
+*/
+async function verificarProduto(id, silencioso = false) {
+  const prod    = db.find(p => p['ID'] === id);
+  if (!prod) return null;
+
+  const cardBtn = document.getElementById(`bv-${id}`);
+  const key     = sessionStorage.getItem('auth_key');
+
+  if (cardBtn) {
+    cardBtn.classList.add('checking');
+    cardBtn.querySelector('.vi').textContent = '⟳';
+  }
+
+  try {
+    const res  = await fetch(`${API_URL}?action=verificar&id=${encodeURIComponent(id)}&key=${key}`);
+    const data = await res.json();
+
+    if (data.status !== 'sucesso') throw new Error(data.mensagem || 'Erro desconhecido');
+
+    // Atualiza estado local — apenas estoque e timestamp
+    prod['Estoque']     = data.estoque;       // "sim" ou "não"
+    prod['UltimaVerif'] = data.ultimaVerif || new Date().toLocaleString('pt-BR');
+
+    refreshCard(id);
+
+    // Atualiza painel se estiver aberto para este produto
+    if (atual && atual['ID'] === id) {
+      sincPainelEstoque(prod['Estoque'], prod['UltimaVerif']);
+    }
+
+    if (!silencioso) {
+      if (data.ativo) {
+        toast('✓ Produto disponível na Shopee', 'success');
+      } else {
+        toast('✕ Produto esgotado ou removido da Shopee', 'error');
+      }
+    }
+
+    if (cardBtn) {
+      cardBtn.classList.remove('checking');
+      cardBtn.classList.add(data.ativo ? 'ok' : 'err');
+      cardBtn.querySelector('.vi').textContent = data.ativo ? '✓' : '✕';
+      setTimeout(() => {
+        cardBtn.classList.remove('ok', 'err');
+        cardBtn.querySelector('.vi').textContent = '⟳';
+      }, 2500);
+    }
+
+    return data;
+
+  } catch (err) {
+    if (!silencioso) toast('Erro ao verificar: ' + err.message, 'error');
+    if (cardBtn) {
+      cardBtn.classList.remove('checking');
+      cardBtn.classList.add('err');
+      cardBtn.querySelector('.vi').textContent = '!';
+      setTimeout(() => {
+        cardBtn.classList.remove('err');
+        cardBtn.querySelector('.vi').textContent = '⟳';
+      }, 2500);
+    }
+    return null;
+  }
+}
+
+// Verificar pelo painel lateral
+async function verificarPainelAtual() {
+  if (!atual) return;
+  const btn = document.getElementById('btnVerifyPanel');
+  const ico = document.getElementById('vpIco');
+  btn.disabled = true;
+  ico.style.animation = 'rot 0.65s linear infinite';
+
+  await verificarProduto(atual['ID'], false);
+
+  btn.disabled = false;
+  ico.style.animation = '';
+}
+
+// ── BATCH VERIFICATION ────────────────────────────────────────────────────────
+async function verificarTodos() {
+  if (!db.length) { toast('Nenhum produto para verificar', 'info'); return; }
+  cancelarLote = false;
+
+  const btnAll = document.getElementById('btnVerifyAll');
+  btnAll.disabled = true;
+  document.getElementById('vaIco').style.animation = 'rot 0.65s linear infinite';
+
+  abrirProgressModal(db);
+
+  let disponiveis = 0, esgotados = 0, erros = 0;
+
+  for (let i = 0; i < db.length; i++) {
+    if (cancelarLote) break;
+    const id = db[i]['ID'];
+    atualizarProgressItem(id, 'doing', '⟳');
+
+    const result = await verificarProduto(id, true);
+
+    if (!result) {
+      erros++;
+      atualizarProgressItem(id, 'err', 'Erro');
+    } else if (!result.ativo) {
+      esgotados++;
+      atualizarProgressItem(id, 'err', 'Esgotado');
+    } else {
+      disponiveis++;
+      atualizarProgressItem(id, 'ok', '● Disponível');
+    }
+
+    atualizarProgressBar(i + 1, db.length);
+    await sleep(450); // pausa para evitar rate limit da API
+  }
+
+  atualizarSidebar();
+  aplicarFiltros();
+
+  const resumo = cancelarLote
+    ? `Cancelado — ${disponiveis + esgotados + erros} verificados`
+    : `● ${disponiveis} disponíveis  ✕ ${esgotados} esgotados  ⚠ ${erros} erros`;
+
+  finalizarProgress(resumo);
+  btnAll.disabled = false;
+  document.getElementById('vaIco').style.animation = '';
+}
+
+function cancelarVerificacao() {
+  cancelarLote = true;
+  document.getElementById('btnCancelarLote').textContent = 'Cancelando...';
+  document.getElementById('btnCancelarLote').disabled = true;
+}
+
+// ── PROGRESS MODAL ────────────────────────────────────────────────────────────
+function abrirProgressModal(produtos) {
+  document.getElementById('progressItems').innerHTML = produtos.map(p => `
+    <div class="progress-item p-wait" id="pi-${p['ID']}">
+      <span class="p-ico">○</span>
+      <span class="p-name">${esc(p['Título'] || 'Sem título')}</span>
+      <span class="p-stat" id="ps-${p['ID']}">Aguardando</span>
+    </div>`).join('');
+
+  document.getElementById('progressBarInner').style.width = '0%';
+  document.getElementById('progressCount').textContent    = `0 / ${produtos.length}`;
+  document.getElementById('progressSummary').textContent  = '';
+  document.getElementById('btnCancelarLote').style.display  = '';
+  document.getElementById('btnCancelarLote').disabled       = false;
+  document.getElementById('btnCancelarLote').textContent    = 'Cancelar';
+  document.getElementById('btnFecharProgress').style.display = 'none';
+  document.getElementById('progressModal').classList.add('open');
+}
+
+function atualizarProgressItem(id, estado, statusText) {
+  const item   = document.getElementById(`pi-${id}`);
+  const status = document.getElementById(`ps-${id}`);
+  if (!item || !status) return;
+  item.className = `progress-item p-${estado}`;
+  item.querySelector('.p-ico').textContent =
+    estado === 'ok' ? '●' : estado === 'err' ? '✕' : estado === 'doing' ? '⟳' : '○';
+  status.textContent = statusText;
+  item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function atualizarProgressBar(current, total) {
+  document.getElementById('progressBarInner').style.width = `${(current/total)*100}%`;
+  document.getElementById('progressCount').textContent    = `${current} / ${total}`;
+}
+
+function finalizarProgress(resumo) {
+  document.getElementById('progressSummary').textContent     = resumo;
+  document.getElementById('btnCancelarLote').style.display   = 'none';
+  document.getElementById('btnFecharProgress').style.display = '';
+}
+
+function fecharProgressModal() {
+  document.getElementById('progressModal').classList.remove('open');
+}
+
+// ── API ACTIONS ───────────────────────────────────────────────────────────────
 async function chamarAtualizar(id, campo, valor) {
   try {
     const res  = await fetch(API_URL, {
@@ -1412,19 +1913,15 @@ async function toggleStatus(event, id) {
   event.stopPropagation();
   const prod = db.find(p => p['ID'] === id);
   if (!prod) return;
-
   const novo = prod['Status'] === 'feito' ? 'pendente' : 'feito';
-
   prod['Status'] = novo;
   refreshCard(id);
   atualizarSidebar();
   if (atual && atual['ID'] === id) sincPainelStatus(novo);
-
   const ok = await chamarAtualizar(id, 'Status', novo);
   if (!ok) {
     prod['Status'] = novo === 'feito' ? 'pendente' : 'feito';
-    refreshCard(id);
-    atualizarSidebar();
+    refreshCard(id); atualizarSidebar();
     if (atual && atual['ID'] === id) sincPainelStatus(prod['Status']);
   } else {
     toast(novo === 'feito' ? '✓ Marcado como feito!' : '○ Marcado como pendente', 'success');
@@ -1467,59 +1964,49 @@ async function setCategoria(cat) {
 
 async function salvarComentario() {
   if (!atual) return;
-  const id      = atual['ID'];
-  const coment  = document.getElementById('panelComment').value;
-  const btn     = document.getElementById('btnSaveComment');
-
-  btn.disabled     = true;
-  btn.textContent  = 'Salvando…';
-
+  const id     = atual['ID'];
+  const coment = document.getElementById('panelComment').value;
+  const btn    = document.getElementById('btnSaveComment');
+  btn.disabled    = true;
+  btn.textContent = 'Salvando…';
   const ok = await chamarAtualizar(id, 'Comentário', coment);
-
   btn.disabled = false;
   if (ok) {
     atual['Comentário'] = coment;
     refreshCard(id);
     btn.textContent = '✓ Salvo!';
     btn.classList.add('saved');
-    setTimeout(() => {
-      btn.textContent = 'Salvar comentário';
-      btn.classList.remove('saved');
-    }, 2000);
+    setTimeout(() => { btn.textContent = 'Salvar comentário'; btn.classList.remove('saved'); }, 2000);
     toast('Comentário salvo', 'success');
   } else {
     btn.textContent = 'Salvar comentário';
   }
 }
 
-// ── ADD PRODUCT ──────────────────────────────────────────────────────────────
+// ── ADD PRODUCT ───────────────────────────────────────────────────────────────
 async function salvarNovoProduto() {
   const link   = document.getElementById('inputLink').value.trim();
   const titulo = document.getElementById('inputTitulo').value.trim();
   const cat    = document.getElementById('inputCat').value;
   const prio   = document.getElementById('inputPrio').value;
-
   if (!link) { toast('Cole o link do produto!', 'error'); return; }
 
-  const btn   = document.getElementById('btnSubmit');
-  const lbl   = document.getElementById('btnSubmitLabel');
+  const btn = document.getElementById('btnSubmit');
   btn.disabled = true;
-  btn.innerHTML = '<div class="spin"></div> Processando API…';
+  btn.innerHTML = '<div class="spin"></div> Processando…';
 
   try {
     const res  = await fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'adicionar', link, titulo: titulo.trim(), categoria: cat, prioridade: prio })
+      body: JSON.stringify({ action: 'adicionar', link, titulo, categoria: cat, prioridade: prio })
     });
     const data = await res.json();
-
     if (data.status === 'sucesso') {
       toast('✓ Produto adicionado!', 'success');
       fecharModal();
-      document.getElementById('inputLink').value   = '';
-      document.getElementById('inputTitulo').value = '';
-      document.getElementById('inputCat').value    = '';
-      document.getElementById('inputPrio').value   = 'média';
+      ['inputLink','inputTitulo'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('inputCat').value  = '';
+      document.getElementById('inputPrio').value = 'média';
       await carregarDados();
     } else {
       toast('❌ ' + (data.mensagem || 'Erro desconhecido'), 'error');
@@ -1532,17 +2019,13 @@ async function salvarNovoProduto() {
   }
 }
 
-// ── DELETE ───────────────────────────────────────────────────────────────────
+// ── DELETE ────────────────────────────────────────────────────────────────────
 async function deletarProduto(event, id) {
   event.stopPropagation();
   if (!confirm('Excluir este produto da planilha?')) return;
-  
-  // Resgata a chave para autorizar a exclusão
-  const key = sessionStorage.getItem("auth_key");
-  
+  const key = sessionStorage.getItem('auth_key');
   try {
-    // Injeta a chave na URL para o Google Script permitir a exclusão
-    await fetch(`${API_URL}?action=deletar&id=${id}&key=${key}`);
+    await fetch(`${API_URL}?action=deletar&id=${encodeURIComponent(id)}&key=${key}`);
     db = db.filter(p => p['ID'] !== id);
     if (atual && atual['ID'] === id) fecharPainel();
     atualizarSidebar();
@@ -1558,28 +2041,27 @@ async function deletarAtual() {
   await deletarProduto({ stopPropagation: () => {} }, atual['ID']);
 }
 
-// ── MODAL ────────────────────────────────────────────────────────────────────
+// ── MODAL ─────────────────────────────────────────────────────────────────────
 function abrirModal()  { document.getElementById('modal').classList.add('open'); }
 function fecharModal() { document.getElementById('modal').classList.remove('open'); }
 
-// ── UTILS ────────────────────────────────────────────────────────────────────
+// ── UTILS ─────────────────────────────────────────────────────────────────────
 function precoNum(p) {
   let n = parseFloat(p['Preço'] || 0);
   if (n > 10000) n = n / 100000;
   return n;
 }
-
 function fmtMoeda(valor) {
   if (!valor) return 'R$ 0,00';
   return precoNum({ Preço: valor }).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
-
 function esc(str) {
   if (!str) return '';
   const d = document.createElement('div');
   d.textContent = str;
   return d.innerHTML;
 }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 let _toastTimer;
 function toast(msg, tipo = 'info') {
@@ -1587,9 +2069,8 @@ function toast(msg, tipo = 'info') {
   el.textContent = msg;
   el.className = 'show ' + tipo;
   clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => el.className = '', 3000);
+  _toastTimer = setTimeout(() => el.className = '', 3200);
 }
 </script>
-
 </body>
 </html>
