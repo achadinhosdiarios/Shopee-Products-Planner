@@ -2046,15 +2046,31 @@ function abrirModal()  { document.getElementById('modal').classList.add('open');
 function fecharModal() { document.getElementById('modal').classList.remove('open'); }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
+
 function precoNum(p) {
-  let n = parseFloat(p['Preço'] || 0);
-  if (n > 10000) n = n / 100000;
-  return n;
+  let v = p['Preço'];
+  if (!v) return 0;
+  if (typeof v === 'number') return v;
+  
+  // Limpa a string que vem da planilha: tira "R$", espaços, pontos de milhar e troca vírgula por ponto
+  let limpo = String(v).replace(/R\$\s?/gi, '').replace(/\./g, '').replace(',', '.').trim();
+  let n = parseFloat(limpo);
+  
+  return isNaN(n) ? 0 : n;
 }
+
 function fmtMoeda(valor) {
   if (!valor) return 'R$ 0,00';
+  
+  // Se a planilha já mandou o texto bonitinho com "R$", apenas mostramos ele
+  if (typeof valor === 'string' && valor.includes('R$')) {
+    return valor;
+  }
+  
+  // Caso contrário, formata
   return precoNum({ Preço: valor }).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
+
 function esc(str) {
   if (!str) return '';
   const d = document.createElement('div');
