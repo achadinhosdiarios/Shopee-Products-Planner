@@ -2887,10 +2887,20 @@
     // ── UTILS ─────────────────────────────────────────────────────────────────────
     function precoNum(p) {
       let v = p['Preço'];
-      if (!v) return 0;
+      if (!v && v !== 0) return 0;
       if (typeof v === 'number') return v;
-      let limpo = String(v).replace(/R\$\s?/gi, '').replace(/\./g, '').replace(',', '.').trim();
-      let n = parseFloat(limpo);
+
+      let str = String(v).replace(/R\$\s?/gi, '').trim();
+
+      // Se houver vírgula, é formato PT-BR (ex: 1.375,00 ou 137,50). 
+      // Removemos os pontos de milhar e trocamos a vírgula decimal por ponto.
+      if (str.includes(',')) {
+        str = str.replace(/\./g, '').replace(',', '.');
+      }
+      // Se NÃO houver vírgula, significa que já está no formato americano do DB/API (ex: 137.50).
+      // O parseFloat já vai entender o ponto nativo corretamente.
+
+      let n = parseFloat(str);
       return isNaN(n) ? 0 : n;
     }
 
